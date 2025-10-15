@@ -1,108 +1,203 @@
-"use server";
+'use server'
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { headers } from "next/headers";
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { db } from '@/db'
+import { users } from '@/db/schema'
 
-export async function loginWithEmail(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+// ---------- VALIDATION SCHEMAS ----------
 
-  if (!email || !password) {
-    return {
-      success: false as const,
-      error: "Email and password are required",
-    };
-  }
+const loginSchema = z.object({
+	email: z.string().email('Invalid email address'),
+	password: z.string().min(6, 'Password must be at least 6 characters'),
+})
 
-  const supabase = await createClient();
+const signupSchema = z.object({
+	email: z.string().email('Invalid email address'),
+	password: z
+		.string()
+		.min(8, 'Password must be at least 8 characters')
+		.regex(
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+			'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+		),
+	displayName: z.string().min(2, 'Display name must be at least 2 characters'),
+})
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+// ---------- AUTH ACTIONS ----------
 
-  if (error) {
-    return { success: false as const, error: error.message };
-  }
+/**
+ * Login with email and password
+ */
+export async function login(formData: FormData) {
+	const email = formData.get('email') as string
+	const password = formData.get('password') as string
 
-  revalidatePath("/", "layout");
-  return { success: true as const, message: "Logged in successfully!" };
+	try {
+		// Validate input
+		const validated = loginSchema.parse({ email, password })
+
+		const supabase = await createClient()
+
+		const { error } = await supabase.auth.signInWithPassword({
+			email: validated.email,
+			password: validated.password,
+		})
+
+		if (error) {
+			return {
+				success: false,
+				error: error.message,
+			}
+		}
+
+		revalidatePath('/', 'layout')
+		redirect('/dashboard')
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: error.issues[0].message,
+			}
+		}
+
+		if (error instanceof Error) {
+			// Check if it's a redirect error (which is expected)
+			if (error.message.includes('NEXT_REDIRECT')) {
+				throw error
+			}
+			return {
+				success: false,
+				error: error.message,
+			}
+		}
+
+		return {
+			success: false,
+			error: 'An unexpected error occurred',
+		}
+	}
 }
 
-export async function signupWithEmail(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+/**
+ * Sign up with email and password
+ */
+export async function signup(formData: FormData) {
+	const email = formData.get('email') as string
+	const password = formData.get('password') as string
+	const displayName = formData.get('displayName') as string
 
-  if (!email || !password) {
-    return {
-      success: false as const,
-      error: "Email and password are required",
-    };
-  }
+	try {
+		// Validate input
+		const validated = signupSchema.parse({ email, password, displayName })
 
-  if (password.length < 6) {
-    return {
-      success: false as const,
-      error: "Password must be at least 6 characters long",
-    };
-  }
+		const supabase = await createClient()
 
-  const supabase = await createClient();
-  const headersList = await headers();
-  const origin = headersList.get("origin");
+	const { data, error } = await supabase.auth.signUp({
+		email: validated.email,
+		password: validated.password,
+		options: {
+			data: {
+				display_name: validated.displayName,
+			},
+		},
+	})
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  });
+	if (error) {
+		return {
+			success: false,
+			error: error.message,
+		}
+	}
 
-  if (error) {
-    return { success: false as const, error: error.message };
-  }
+	// Create user in database if auth user was created
+	if (data?.user) {
+		await db.insert(users).values({
+			id: data.user.id,
+			displayName: validated.displayName,
+			avatarUrl: data.user.user_metadata.avatar_url || null,
+		})
+	}
 
-  return {
-    success: true as const,
-    message: "Check your email to confirm your account",
-  };
+	// If email confirmation is required, show message
+	if (data?.user && !data.session) {
+		return {
+			success: true,
+			requiresConfirmation: true,
+			message: 'Please check your email to confirm your account',
+		}
+	}
+
+	revalidatePath('/', 'layout')
+	redirect('/dashboard')
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: error.issues[0].message,
+			}
+		}
+
+		if (error instanceof Error) {
+			// Check if it's a redirect error (which is expected)
+			if (error.message.includes('NEXT_REDIRECT')) {
+				throw error
+			}
+			return {
+				success: false,
+				error: error.message,
+			}
+		}
+
+		return {
+			success: false,
+			error: 'An unexpected error occurred',
+		}
+	}
 }
 
+/**
+ * Login with Google OAuth
+ */
 export async function loginWithGoogle() {
-  const supabase = await createClient();
-  const headersList = await headers();
-  const origin = headersList.get("origin");
+	const supabase = await createClient()
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${origin}/auth/callback`,
-    },
-  });
+	const { data, error } = await supabase.auth.signInWithOAuth({
+		provider: 'google',
+		options: {
+			redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+		},
+	})
 
-  if (error) {
-    return { success: false, error: error.message };
-  }
+	if (error) {
+		return {
+			success: false,
+			error: error.message,
+		}
+	}
 
-  if (data.url) {
-    redirect(data.url);
-  }
+	if (data.url) {
+		redirect(data.url)
+	}
 }
 
+/**
+ * Logout current user
+ */
 export async function logout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  revalidatePath("/", "layout");
-  redirect("/login");
-}
+	const supabase = await createClient()
 
-export async function getUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+	const { error } = await supabase.auth.signOut()
+
+	if (error) {
+		return {
+			success: false,
+			error: error.message,
+		}
+	}
+
+	revalidatePath('/', 'layout')
+	redirect('/login')
 }

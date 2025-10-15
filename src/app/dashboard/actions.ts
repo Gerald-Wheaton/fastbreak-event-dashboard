@@ -1,60 +1,125 @@
-"use server";
+'use server'
 
-import { db } from "@/db";
-import { events, venues, sports } from "@/db/schema";
-import { eq, like, and, desc } from "drizzle-orm";
+import { revalidatePath } from 'next/cache'
+import { db } from '@/db'
+import { events, venues, sports, states, users } from '@/db/schema'
+import { eq, desc } from 'drizzle-orm'
+import { eventUpdateSchema, type EventUpdate } from '@/db/validations'
+import type { EventWithRelations } from '@/db/types'
 
-export async function getEvents({
-  search,
-  sport,
-}: {
-  search?: string;
-  sport?: string;
-}) {
-  try {
-    let query = db
-      .select({
-        id: events.id,
-        name: events.name,
-        description: events.description,
-        startsAt: events.startsAt,
-        createdAt: events.createdAt,
-        sport: {
-          id: sports.id,
-          name: sports.name,
-        },
-        venue: {
-          id: venues.id,
-          name: venues.name,
-          city: venues.city,
-          stateAbbr: venues.stateAbbr,
-        },
-      })
-      .from(events)
-      .leftJoin(sports, eq(events.sportId, sports.id))
-      .leftJoin(venues, eq(events.venueId, venues.id))
-      .orderBy(desc(events.startsAt));
+/**
+ * Fetch all events with full relations (sport, venue with state, owner)
+ */
+export async function getEvents(): Promise<EventWithRelations[]> {
+	try {
+		const result = await db.query.events.findMany({
+			with: {
+				sport: true,
+				venue: {
+					with: {
+						state: true,
+					},
+				},
+				owner: true,
+			},
+			orderBy: [desc(events.startsAt)],
+		})
 
-    // Apply filters
-    const filters = [];
+		return result as EventWithRelations[]
+	} catch (error) {
+		console.error('Error fetching events:', error)
+		return []
+	}
+}
 
-    if (search) {
-      filters.push(like(events.name, `%${search}%`));
-    }
+/**
+ * Fetch all sports from the database
+ */
+export async function getSports() {
+	try {
+		return await db.select().from(sports).orderBy(sports.name)
+	} catch (error) {
+		console.error('Error fetching sports:', error)
+		return []
+	}
+}
 
-    if (sport) {
-      filters.push(eq(events.sportId, sport));
-    }
+/**
+ * Fetch all venues with state relations
+ */
+export async function getVenues() {
+	try {
+		const result = await db.query.venues.findMany({
+			with: {
+				state: true,
+			},
+			orderBy: [venues.name],
+		})
+		return result
+	} catch (error) {
+		console.error('Error fetching venues:', error)
+		return []
+	}
+}
 
-    if (filters.length > 0) {
-      query = query.where(and(...filters)) as typeof query;
-    }
+/**
+ * Update an existing event
+ */
+export async function updateEvent(id: string, data: EventUpdate) {
+	try {
+		// Validate data
+		const validatedData = eventUpdateSchema.parse(data)
 
-    const result = await query;
+		// Update event
+		const [updatedEvent] = await db
+			.update(events)
+			.set({
+				...validatedData,
+				updatedAt: new Date(),
+			})
+			.where(eq(events.id, id))
+			.returning()
 
-    return result;
-  } catch (error) {
-    console.error("Error fetching events:", error);
-    return [];
-  }
+		if (!updatedEvent) {
+			return { success: false, error: 'Event not found' }
+		}
+
+		revalidatePath('/dashboard')
+		return { success: true, data: updatedEvent }
+	} catch (error) {
+		console.error('Error updating event:', error)
+
+		if (error instanceof Error) {
+			return { success: false, error: error.message }
+		}
+
+		return { success: false, error: 'Failed to update event' }
+	}
+}
+
+/**
+ * Delete an event by ID
+ */
+export async function deleteEvent(id: string) {
+	try {
+		const [deletedEvent] = await db
+			.delete(events)
+			.where(eq(events.id, id))
+			.returning()
+
+		if (!deletedEvent) {
+			return { success: false, error: 'Event not found' }
+		}
+
+		revalidatePath('/dashboard')
+		return { success: true }
+	} catch (error) {
+		console.error('Error deleting event:', error)
+
+		if (error instanceof Error) {
+			return { success: false, error: error.message }
+		}
+
+		return { success: false, error: 'Failed to delete event' }
+	}
 }
