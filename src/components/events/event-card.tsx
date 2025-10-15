@@ -169,9 +169,9 @@ export function EventCard({
 							</>
 						)}
 						<Button
-							variant="ghost"
+							variant="destructive"
 							size="sm"
-							className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+							// className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
 							onClick={() => onDelete?.(event.id)}
 						>
 							<Trash2 className="mr-2 h-4 w-4" />

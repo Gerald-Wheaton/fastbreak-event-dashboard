@@ -31,7 +31,7 @@ export function ThemeToggle() {
 			variant="ghost"
 			size="icon"
 			onClick={toggleTheme}
-			className="rounded-full"
+			className="rounded-full border-none hover:border-none"
 			aria-label="Toggle theme"
 		>
 			{theme === 'dark' ? (
