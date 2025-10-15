@@ -159,31 +159,6 @@ export async function signup(formData: FormData) {
 }
 
 /**
- * Login with Google OAuth
- */
-export async function loginWithGoogle() {
-	const supabase = await createClient()
-
-	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider: 'google',
-		options: {
-			redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-		},
-	})
-
-	if (error) {
-		return {
-			success: false,
-			error: error.message,
-		}
-	}
-
-	if (data.url) {
-		redirect(data.url)
-	}
-}
-
-/**
  * Logout current user
  */
 export async function logout() {
