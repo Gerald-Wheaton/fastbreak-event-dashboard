@@ -19,10 +19,10 @@ export async function createVenue(data: VenueInsert) {
 	try {
 		const validatedData = venueInsertSchema.parse(data)
 		const [newVenue] = await db.insert(venues).values(validatedData).returning()
-		
+
 		revalidatePath('/create-event')
 		revalidatePath('/dashboard')
-		
+
 		return { success: true, data: newVenue }
 	} catch (error) {
 		console.error('Error creating venue:', error)
@@ -34,4 +34,3 @@ export async function createVenue(data: VenueInsert) {
 		return { success: false, error: 'Failed to create venue' }
 	}
 }
-

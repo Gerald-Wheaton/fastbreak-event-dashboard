@@ -12,6 +12,8 @@ import {
 import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from './logout-button'
 import { ThemeToggle } from './theme-toggle'
+import { MobileNav } from './mobile-nav'
+import { logout } from '@/app/actions'
 
 export async function Header() {
 	const supabase = await createClient()
@@ -19,7 +21,7 @@ export async function Header() {
 		data: { user },
 	} = await supabase.auth.getUser()
 
-	// Don't show header on auth pages
+	// Don&apos;t show header on auth pages
 	if (!user) {
 		return null
 	}
@@ -27,41 +29,42 @@ export async function Header() {
 	const displayName = user.user_metadata?.display_name || user.email
 
 	return (
-		<header className="border-border bg-card border-b">
-			<div className="container mx-auto flex h-16 items-center justify-between px-4">
-				<Link href="/dashboard" className="flex items-center gap-2">
-					<LandPlot className="text-primary h-6 w-6" />
-					<span className="text-foreground text-xl font-bold">Put Me In Coach</span>
-				</Link>
-
-				<nav className="flex items-center gap-4">
-					<Link href="/dashboard">
-						<Button variant="ghost">Dashboard</Button>
+		<header className="border-border bg-card/95 supports-[backdrop-filter]:bg-card/60 sticky top-0 z-50 border-b backdrop-blur">
+			<div className="container mx-auto h-16 px-4">
+				{/* Mobile Layout */}
+				<div className="flex h-full items-center justify-between md:hidden">
+					<MobileNav displayName={displayName} onLogout={logout} />
+					<Link href="/dashboard" className="flex items-center gap-2">
+						<LandPlot className="text-primary h-6 w-6" />
+						<span className="text-foreground text-xl font-bold">
+							Put Me In Coach
+						</span>
 					</Link>
-					<Link href="/create-event">
-						<Button variant="default">Create Event</Button>
-					</Link>
-
 					<ThemeToggle />
+				</div>
 
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" className="rounded-full">
-								<User className="h-5 w-5" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-56">
-							<DropdownMenuLabel>{displayName}</DropdownMenuLabel>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem>
-								<User className="mr-2 h-4 w-4" />
-								Profile
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<LogoutButton />
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</nav>
+				{/* Desktop Layout */}
+				<div className="hidden h-full items-center justify-between md:flex">
+					<Link href="/dashboard" className="flex items-center gap-2">
+						<LandPlot className="text-primary h-6 w-6" />
+						<span className="text-foreground text-xl font-bold">
+							Put Me In Coach
+						</span>
+					</Link>
+
+					<nav className="flex items-center gap-4">
+						<Link href="/dashboard">
+							<Button variant="ghost">Dashboard</Button>
+						</Link>
+						<Link href="/create-event">
+							<Button variant="ghost">Create Event</Button>
+						</Link>
+
+						<ThemeToggle />
+
+						<LogoutButton />
+					</nav>
+				</div>
 			</div>
 		</header>
 	)
