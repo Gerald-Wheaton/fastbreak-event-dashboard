@@ -108,17 +108,18 @@ export function EditEventDialog({
 						/>
 					</div>
 
-					<div className="flex gap-2">
+					<div className="flex justify-end">
+						<div className="flex gap-2 w-fit">
 						<Button type="submit" className="flex-1">
 							Save Changes
 						</Button>
 						<Button
 							type="button"
-							variant="outline"
+							variant="ghost"
 							onClick={() => onOpenChange(false)}
 						>
 							Cancel
-						</Button>
+						</Button></div>
 					</div>
 				</form>
 			</DialogContent>

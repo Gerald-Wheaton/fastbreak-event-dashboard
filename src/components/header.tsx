@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Calendar, LogOut, User } from 'lucide-react'
+import { Calendar, User } from 'lucide-react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from './logout-button'
+import { ThemeToggle } from './theme-toggle'
 
 export async function Header() {
 	const supabase = await createClient()
@@ -40,6 +41,8 @@ export async function Header() {
 					<Link href="/create-event">
 						<Button variant="default">Create Event</Button>
 					</Link>
+
+					<ThemeToggle />
 
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
