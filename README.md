@@ -1,76 +1,99 @@
 # FB Event Dashboard
 
-A Next.js application with Supabase, Drizzle ORM, Zod, and Tailwind CSS.
+Sports event management platform for creating, viewing, editing, and deleting events. Built with Next.js 15 App Router, Supabase, and Drizzle ORM.
 
 ## Tech Stack
 
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Utility-first CSS framework
-- **Supabase** - Backend as a Service (Auth, Database, Storage)
-- **Drizzle ORM** - TypeScript ORM for database operations
-- **Zod** - Schema validation
+**Runtime & Framework**
+- Bun (package manager)
+- Next.js 15 (App Router, RSC, Server Actions)
+- TypeScript
+- React 19
 
-## Getting Started
+**Database & Auth**
+- Supabase (Postgres + Auth)
+- Drizzle ORM (direct SQL via postgres-js)
+- Zod (runtime validation)
 
-### Prerequisites
+**UI**
+- Tailwind CSS 4
+- shadcn/ui components
+- next-themes (dark mode)
+- react-hook-form + sonner (forms + toasts)
 
-- Node.js 18+ installed
-- A Supabase project ([create one here](https://supabase.com))
+**Testing**
+- Vitest + React Testing Library
 
-### Installation
-
-1. Clone or navigate to this repository
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Set up environment variables:
-   - Copy `.env.local.example` to `.env.local`
-   - Fill in your Supabase credentials from your Supabase project settings
-
-4. Push database schema to Supabase:
+## Quick Start
 
 ```bash
-npm run db:push
+# Install dependencies
+bun install
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Add your Supabase credentials
+
+# Push schema to database
+bun db:push
+
+# Seed reference data (US states + sports)
+bun db:seed
+
+# Start dev server
+bun dev
 ```
 
-5. Start the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+Open [http://localhost:3000](http://localhost:3000)
 
 ## Database Commands
 
-- `npm run db:generate` - Generate migration files from schema changes
-- `npm run db:migrate` - Run migrations
-- `npm run db:push` - Push schema changes directly to database (useful for development)
-- `npm run db:studio` - Open Drizzle Studio to view and edit your database
+```bash
+bun db:push           # Push schema changes (dev)
+bun db:generate       # Generate migrations
+bun db:migrate        # Run migrations
+bun db:studio         # Open Drizzle Studio
+bun db:seed           # Seed states + sports
+```
+
+## Key Features
+
+- **Event CRUD**: Create, view, edit, delete events via dialogs (no separate edit pages)
+- **Venue Management**: Enhanced command palette selector with inline creation
+- **Search & Filters**: Sport filters, time period filters, search by name/description
+- **Dual DB Access**: Drizzle for mutations, Supabase client for auth
+- **Type-Safe Validation**: Drizzle schema → Zod schemas → form validation
 
 ## Project Structure
 
 ```
-├── src/
-│   ├── app/          # Next.js app router pages
-│   ├── db/
-│   │   ├── index.ts  # Drizzle database client
-│   │   └── schema.ts # Database schema definitions
-│   └── lib/
-│       └── supabase.ts # Supabase client
-├── drizzle/          # Migration files
-└── drizzle.config.ts # Drizzle configuration
+src/
+├── app/
+│   ├── (auth)/              # Login page (public)
+│   ├── (dashboard)/         # Main dashboard + actions
+│   ├── create-event/        # Event creation page
+│   └── venues/              # Venue actions
+├── components/
+│   ├── ui/                  # shadcn/ui components
+│   ├── events/              # Event-related components
+│   └── dashboard/           # Dashboard-specific
+├── db/
+│   ├── schema.ts            # Drizzle schema
+│   ├── validations.ts       # Zod schemas
+│   └── seeds/               # Seed scripts
+└── lib/
+    ├── supabase.ts          # Supabase client
+    └── utils.ts             # Utilities (cn, etc.)
 ```
 
-## Learn More
+## Architecture Notes
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Supabase Documentation](https://supabase.com/docs)
-- [Drizzle ORM Documentation](https://orm.drizzle.team)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Zod Documentation](https://zod.dev)
+**Validation Strategy**: Three-layer validation (Drizzle schema → Zod schemas → form validation). See `src/db/validations.ts` for Insert/Update/Select schemas.
+
+**Database Pattern**: Drizzle for server actions (mutations), Supabase client for auth. Reference data (states, sports) is seeded, not user-managed.
+
+**Server Actions**: Located in `actions.ts` files within the same directory as the page consuming them. Return `{ success, error }` objects instead of throwing.
+
+**Route Pattern**: Edit/delete via dialogs on dashboard, not separate routes.
+
+For detailed development guidelines, see [CLAUDE.md](./CLAUDE.md).

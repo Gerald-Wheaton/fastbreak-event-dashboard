@@ -54,51 +54,65 @@ export function SearchFilter({
 	}
 
 	return (
-		<div className="space-y-4">
-			<div className="flex flex-wrap items-center gap-2">
-				<span className="text-muted-foreground text-sm font-medium">View:</span>
-				<Badge
-					variant={timePeriod === 'all' ? 'default' : 'outline'}
-					className={cn(
-						'cursor-pointer transition-all hover:scale-105',
-						timePeriod === 'all' && 'bg-primary text-primary-foreground'
-					)}
-					onClick={() => handleTimePeriodChange('all')}
-				>
-					All Events
-				</Badge>
-				<Badge
-					variant={timePeriod === 'today' ? 'default' : 'outline'}
-					className={cn(
-						'cursor-pointer transition-all hover:scale-105',
-						timePeriod === 'today' && 'bg-primary text-primary-foreground'
-					)}
-					onClick={() => handleTimePeriodChange('today')}
-				>
-					Today
-				</Badge>
-				<Badge
-					variant={timePeriod === 'month' ? 'default' : 'outline'}
-					className={cn(
-						'cursor-pointer transition-all hover:scale-105',
-						timePeriod === 'month' && 'bg-primary text-primary-foreground'
-					)}
-					onClick={() => handleTimePeriodChange('month')}
-				>
-					This Month
-				</Badge>
+		<div className="space-y-4 rounded-lg border bg-card p-4 drop-shadow-sm drop-shadow-primary">
+			{/* Top Row: Search Bar + View Filters */}
+			<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+				{/* Search Bar */}
+				<div className="relative flex-1">
+					<Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+					<Input
+						placeholder="Search events..."
+						value={search}
+						onChange={(e) => handleSearchChange(e.target.value)}
+						className="pl-9"
+					/>
+				</div>
+
+				{/* View Filters */}
+				<div className="flex items-center gap-2">
+					<span className="text-sm font-medium">View:</span>
+					<Badge
+						variant={timePeriod === 'all' ? 'default' : 'outline'}
+						className={cn(
+							'cursor-pointer transition-colors',
+							timePeriod === 'all' && 'bg-primary text-primary-foreground'
+						)}
+						onClick={() => handleTimePeriodChange('all')}
+					>
+						All
+					</Badge>
+					<Badge
+						variant={timePeriod === 'today' ? 'default' : 'outline'}
+						className={cn(
+							'cursor-pointer transition-colors',
+							timePeriod === 'today' && 'bg-primary text-primary-foreground'
+						)}
+						onClick={() => handleTimePeriodChange('today')}
+					>
+						Today
+					</Badge>
+					<Badge
+						variant={timePeriod === 'month' ? 'default' : 'outline'}
+						className={cn(
+							'cursor-pointer transition-colors',
+							timePeriod === 'month' && 'bg-primary text-primary-foreground'
+						)}
+						onClick={() => handleTimePeriodChange('month')}
+					>
+						Month
+					</Badge>
+				</div>
 			</div>
 
-			<div className="flex max-w-lg flex-wrap items-center gap-3">
-				<span className="text-muted-foreground text-sm font-medium">
-					Sport:
-				</span>
+			{/* Bottom Row: Sport Filters */}
+			<div className="flex flex-wrap items-center gap-2">
+				<span className="text-sm font-medium">Sport:</span>
 				<Badge
 					variant={sportFilters.length === 0 ? 'default' : 'outline'}
 					className={cn(
-						'cursor-pointer border-2 transition-all hover:scale-110',
+						'cursor-pointer border-2 transition-colors',
 						sportFilters.length === 0
-							? 'bg-primary text-primary-foreground border-primary scale-110'
+							? 'bg-primary text-primary-foreground border-primary'
 							: 'border-border'
 					)}
 					onClick={() => handleSportFilterChange('all')}
@@ -112,13 +126,13 @@ export function SearchFilter({
 							key={sport.id}
 							variant="outline"
 							className={cn(
-								'text-foreground cursor-pointer border-2 transition-all hover:scale-110',
+								'text-foreground cursor-pointer border-2 transition-all hover:scale-105',
 								isSelected && 'scale-110'
 							)}
 							style={{
 								borderColor: sport.color || 'transparent',
 								backgroundColor: isSelected
-									? `${sport.color}40`
+									? `${sport.color}70`
 									: 'transparent',
 							}}
 							onClick={() => handleSportFilterChange(sport.id)}
@@ -127,16 +141,6 @@ export function SearchFilter({
 						</Badge>
 					)
 				})}
-			</div>
-
-			<div className="relative max-w-sm">
-				<Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-				<Input
-					placeholder="Search events..."
-					value={search}
-					onChange={(e) => handleSearchChange(e.target.value)}
-					className="pl-9"
-				/>
 			</div>
 		</div>
 	)
