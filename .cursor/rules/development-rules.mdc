@@ -1,0 +1,65 @@
+---
+alwaysApply: true
+---
+
+# Development Rules
+
+## Architecture & Components
+- **Favor RSC**; use `'use client'` only for interactivity (forms, toasts, inputs) or browser-only APIs.
+- **App Router**: colocate UI with routes; avoid pages dir.
+- **Composition over inheritance**: prefer `children` and render props patterns.
+- **Naming**: files/dirs `kebab-case`; components `PascalCase.tsx`.
+- **Imports**: use `@/` alias (configure in `tsconfig.json` + `next.config.ts`).
+
+## Data Fetching & Server Actions
+- **All DB interactions are server-side.** Prefer **Server Actions** over API routes.
+- **No direct Supabase client calls in client components.**
+- Each action uses **Zod** validation and returns typed results:
+  - On failure, throw an `ActionError` with a serializable shape `{ code, message, issues? }`.
+  - On success, return minimal payloads for UI transitions.
+- Reads in RSC where possible (`async` components) with `cache`/`revalidateTag` strategy when needed.
+- Server Actions live alongside their respective routes, e.g., in app/page-name/actions.ts. Actions are imported and invoked directly within the route file (page.tsx) when possible, or passed as props to child components.
+For example: an edit form might use app/edit/page.tsx and app/edit/actions.ts, where page.tsx includes import { editEvent } from "./actions".
+
+### Database Schema & Types (Drizzle)
+
+- All database tables are defined in `src/db/schema.ts` using **Drizzle ORM**.
+- Corresponding inferred types are defined in `src/db/types.ts` using:
+
+  ```ts
+  import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+  import { events, venues, sports, states, users } from "./schema";
+
+  export type Event = InferSelectModel<typeof events>;
+  export type NewEvent = InferInsertModel<typeof events>;
+
+  export type Venue = InferSelectModel<typeof venues>;
+  export type NewVenue = InferInsertModel<typeof venues>;
+
+  export type Sport = InferSelectModel<typeof sports>;
+  export type State = InferSelectModel<typeof states>;
+  export type User = InferSelectModel<typeof users>;
+  ```
+Any file that interacts with the database (e.g., server actions, utilities, loaders) should import models and types from these files only:
+
+```ts
+import { db } from "@/db";
+import { events } from "@/db/schema";
+import type { Event } from "@/db/types";
+```
+
+Do not redefine entity types or raw interfaces elsewhere — always import from @/db/types to ensure consistency.
+
+All database reads/writes must go through Drizzle queries; never use raw SQL directly unless absolutely necessary.
+
+
+## Forms & UI
+- Use **shadcn/ui** for all primitives.
+- Use **shadcn Form** + **react-hook-form** for all forms.
+- Show **loading states** on mutations and **toasts** for success/error.
+- Use `next/link` for client-side navigation; avoid `a` for internal routes.
+
+## Testing & Quality
+- Schema/action unit tests (happy path + basic validation failures).
+- ESLint + Prettier; strict TS.
+- Descriptive names over cleverness. Avoid premature abstractions.

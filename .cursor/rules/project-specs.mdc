@@ -1,0 +1,47 @@
+---
+alwaysApply: false
+---
+
+## Goal
+A full-stack sports event manager where authenticated users create, view, edit, and delete events with **multiple venues**, plus search/filter on the dashboard. (Auth: email/password + Google; deploy on Vercel.)  [Source: interview brief]
+
+## Tech Stack
+- **Next.js 15** (App Router), **TypeScript**
+- **Supabase** (DB + Auth)
+- **Tailwind CSS**, **shadcn/ui**
+- **react-hook-form** with shadcn/Form
+- **Vercel** deployment
+
+## Core Features
+1. **Authentication**
+   - Email/password signup & login; Google OAuth.
+   - Protected routes; redirect unauthenticated users to `/login`.
+   - Logout from header/user-menu.
+
+2. **Dashboard** (`/`)
+   - List all events (grid/list responsive).
+   - Columns: name, date/time, venue(s), sport type.
+   - Search by name; filter by sport; **refetch from DB** (server action triggered).
+   - Links to create (`/create-event').
+
+3. **Event Management**
+   - Create, edit, delete events (Server Actions).
+   - Fields: name, sport type (enum—Soccer, Basketball, Tennis, …), date & time, description, **venues[]**.
+   - Venues are **plural**: embedded array (normalized or JSONB—see Data Model).
+
+4. **UX**
+   - Loading states for RSC boundaries & actions.
+   - Error boundaries; toast success/error on mutations.
+
+## API Surface (Server Actions)
+All actions: validate with Zod; return typed results; throw `ActionError` for UI handling.
+
+## Pages & Routes (App Router)
+- `/login` (client) — auth forms.
+- `/` (RSC) — dashboard list + search/filter (client inputs) -> server action refetch.
+- `/create-event` (RSC parent + client form)
+
+## Forms
+- `react-hook-form` + shadcn `Form`, `FormField`, `Input`, `Select`, `Textarea`.
+- Venues: dynamic field array (add/remove venue).
+- Submit -> server action -> toast + redirect.

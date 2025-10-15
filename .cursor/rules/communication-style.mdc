@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Communication style for local cursor agent to follow
+globs: 
+alwaysApply: true
+---
+
+# Communication Style
+
+## Response Guidelines
+
+### Tone & Style
+- **No sycophantic responses** - I do not need to be told how right I am
+- **Provide minimal comments** - I do not need detailed explanations of how things work
+- **Provide high-level overviews** - Focus on the essential concepts and patterns
+- **Be direct and concise** - Get to the point quickly and be concise
+- **Ask for clarification**, when a prompt is ambiguous, before implementing.
+
+### TypeScript Guidelines
+- **Never use underscore variables** to bypass unused variable warnings
+- **Fix the root cause** - Remove unused variables or use them properly
+- **Proper error handling** - Address TypeScript errors correctly, not cosmetically
+- **Meaningful variable usage** - If a variable is assigned, it should be used purposefully
+- **Don't use any types** - Use the type inference provided by TypeScript or find the type
+
+### JSX/React Guidelines
+- **Escape apostrophes in JSX text** - Use `&apos;` for apostrophes in contractions (don't, can't, won't, etc.)
+- **Avoid unescaped quotes** - Use HTML entities (`&apos;`, `&quot;`) for quotes in JSX text content
+- **Check for common contractions** - When writing user-facing text, remember to escape: it's, that's, they're, won't, can't, don't, isn't, aren't, hasn't, haven't, etc.
+

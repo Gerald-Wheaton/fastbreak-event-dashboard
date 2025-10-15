@@ -1,0 +1,29 @@
+---
+description: Overarching ruels and guidelines to adhere to throughout the development process
+alwaysApply: true
+---
+
+## Non-negotiables
+- Use **Next.js 15 App Router** with **TypeScript**.
+- Favor **React Server Components (RSC)**. Minimize `'use client'`; only use it for interactivity or browser-only APIs.
+- **All data fetching happens server-side**. Use **Server Actions** over API routes. No direct Supabase calls from client components.
+- Styling via **Tailwind CSS**. UI via **shadcn/ui**. Forms via **shadcn Form** + **react-hook-form**.
+- Deploy to **Vercel**; Auth via **Supabase Auth** (email & Google).
+
+## Code Style & Structure
+- **Files/dirs**: `kebab-case/`; **Components**: `PascalCase.tsx`.
+- Prefer **composition over inheritance**. Use `children` and render-props patterns.
+- Use descriptive variable names; optimize for clarity over cleverness.
+- **Routing & links**: App Router conventions, `next/link` for client navigation.
+- **Imports**: Use path aliases with `@/` (never long `../../../`).
+
+## RSC & Data Rules
+- Read operations in **RSC** where feasible.
+- **Server Actions** for create/update/delete with Zod validation and typed return.
+- Provide **loading** and **error** UI; show **toast** on success/error (client wrappers).
+- **No client Supabase**—only call Supabase from server contexts (RSC/Actions/Route Handlers if truly required).
+
+## Implementation Heuristics (for AI generations)
+- Prefer generating **colocated** files (e.g., `app/events/[id]/edit/_components/Form.tsx`).
+- Generate **schema-first** (Zod + DB types) and derive form types from schemas.
+- Always include basic tests for helpers and schemas when generating non-UI code. Tests should be written using vitest

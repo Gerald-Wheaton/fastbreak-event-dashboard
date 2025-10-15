@@ -1,0 +1,96 @@
+---
+description: Guidelines for using shadcn/ui components consistently throughout this project
+alwaysApply: false
+---
+
+# shadcn/ui Component Usage Guidelines
+
+Follow these guidelines when using shadcn/ui components to maintain consistency and proper implementation patterns.
+
+## Component Location & Imports
+
+All shadcn/ui components are located in `src/components/ui/` and should be imported using absolute paths:
+
+```typescript
+// ✅ Good - Use absolute imports
+import { Button } from '@/src/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
+import { Input } from '@/src/components/ui/input'
+
+// ❌ Bad - Don't use relative imports
+import { Button } from '../ui/button'
+import { Card } from './ui/card'
+```
+
+## Styling Guidelines
+
+### 1. Use CSS Variables & Design Tokens
+
+Always use the built-in CSS variables for colors and spacing:
+
+```typescript
+// ✅ Good - Use semantic color classes
+<div className="bg-background text-foreground border-border">
+<Button className="text-muted-foreground hover:text-foreground">
+
+// ❌ Bad - Don't use arbitrary colors
+<div className="bg-white text-black border-gray-200">
+<Button className="text-gray-500 hover:text-gray-900">
+```
+
+**Common design tokens:**
+- `background`, `foreground` - Main background and text
+- `muted`, `muted-foreground` - Subtle backgrounds and text
+- `border` - Border colors
+- `primary`, `primary-foreground` - Primary brand colors
+- `destructive`, `destructive-foreground` - Error/danger colors
+
+### 2. Component Composition
+
+Extend components using the `cn()` utility and className prop:
+
+```typescript
+// ✅ Good - Extend with additional classes
+<Button 
+  variant="outline" 
+  className={cn("w-full justify-start", isActive && "bg-accent")}
+>
+  Custom Button
+</Button>
+
+// ✅ Good - Conditional styling
+<Card className={cn("transition-all", isSelected && "ring-2 ring-primary")}>
+```
+
+## Component Patterns
+
+### 1. Loading States
+
+Use Skeleton component for loading states:
+
+```typescript
+import { Skeleton } from '@/src/components/ui/skeleton'
+
+// Loading card
+<Card>
+  <CardHeader>
+    <Skeleton className="h-4 w-[250px]" />
+    <Skeleton className="h-4 w-[200px]" />
+  </CardHeader>
+  <CardContent>
+    <Skeleton className="h-[125px] w-full" />
+  </CardContent>
+</Card>
+```
+
+## Common Mistakes to Avoid
+
+1. **Don't mix styling approaches** - Use either shadcn classes OR custom Tailwind, not both
+
+## Adding New shadcn Components
+
+When adding new shadcn components to the project:
+
+1. **Use the CLI**: `npx shadcn-ui add [component-name]`
+2. **Check dependencies**: Ensure all required packages are installed
+3. **Update imports**: Use absolute path imports in your components
