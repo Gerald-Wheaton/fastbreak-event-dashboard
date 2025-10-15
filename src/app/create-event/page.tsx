@@ -1,8 +1,13 @@
-import { EventFormClient } from './event-form-client'
+import { EventFormClient } from '../../components/events/event-form-client'
 import { getSports, getVenues } from '@/app/dashboard/actions'
+import { getStates } from '@/app/venues/actions'
 
 export default async function CreateEventPage() {
-	const [sports, venues] = await Promise.all([getSports(), getVenues()])
+	const [sports, venues, states] = await Promise.all([
+		getSports(),
+		getVenues(),
+		getStates(),
+	])
 
 	return (
 		<div className="min-h-screen">
@@ -14,7 +19,7 @@ export default async function CreateEventPage() {
 					</p>
 				</div>
 
-				<EventFormClient sports={sports} venues={venues} />
+				<EventFormClient sports={sports} venues={venues} states={states} />
 			</main>
 		</div>
 	)

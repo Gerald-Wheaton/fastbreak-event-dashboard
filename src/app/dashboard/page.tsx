@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { getEvents, getSports, getVenues } from './actions'
+import { getStates } from '@/app/venues/actions'
 import { EventsDashboardClient } from '../../components/dashboard/events-dashboard-client'
 
 function LoadingDashboard() {
@@ -15,10 +16,11 @@ function LoadingDashboard() {
 }
 
 export default async function DashboardPage() {
-	const [events, sports, venues] = await Promise.all([
+	const [events, sports, venues, states] = await Promise.all([
 		getEvents(),
 		getSports(),
 		getVenues(),
+		getStates(),
 	])
 
 	return (
@@ -27,6 +29,7 @@ export default async function DashboardPage() {
 				initialEvents={events}
 				sports={sports}
 				venues={venues}
+				states={states}
 			/>
 		</Suspense>
 	)

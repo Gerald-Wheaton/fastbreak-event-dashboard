@@ -14,25 +14,32 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { DateTimePicker } from '@/components/events/date-time-picker'
-import type { Event, Venue, Sport } from '@/db/types'
-import { SportSelector, VenueSelector } from '../selectors'
+import type { Event, Venue, Sport, State } from '@/db/types'
+import { SportSelector } from '../selectors'
+import { VenueSelectorEnhanced } from '../venue-selector-enhanced'
 
 interface EventFormProps {
 	sports: Sport[]
 	venues: Venue[]
+	states: State[]
 	initialData?: Partial<Event> & {
 		venue?: Venue
 	}
 	onSubmit: (data: Partial<Event>) => void
+	onCancel?: () => void
 	submitLabel?: string
+	onVenueCreated?: (venue: Venue) => void
 }
 
 export function EventForm({
 	sports,
 	venues,
+	states,
 	initialData,
 	onSubmit,
+	onCancel,
 	submitLabel = 'Create Event',
+	onVenueCreated,
 }: EventFormProps) {
 	const [name, setName] = useState(initialData?.name || '')
 	const [sportId, setSportId] = useState(initialData?.sportId || '')
@@ -54,7 +61,7 @@ export function EventForm({
 	}
 
 	return (
-		<Card>
+		<Card className="dark:drop-shadow-primary dark:drop-shadow-lg">
 			<CardHeader>
 				<CardTitle>{submitLabel}</CardTitle>
 				<CardDescription>
@@ -90,14 +97,16 @@ export function EventForm({
 						id="starts-at"
 					/>
 
-					<div className="space-y-2">
-						<Label htmlFor="venue">Venue</Label>
-						<VenueSelector
-							venueId={venueId}
-							setVenueId={setVenueId}
-							venues={venues}
-						/>
-					</div>
+				<div className="space-y-2">
+					<Label htmlFor="venue">Venue</Label>
+					<VenueSelectorEnhanced
+						venueId={venueId}
+						setVenueId={setVenueId}
+						venues={venues}
+						states={states}
+						onVenueCreated={onVenueCreated}
+					/>
+				</div>
 
 					<div className="space-y-2">
 						<Label htmlFor="description">Description</Label>
@@ -110,13 +119,15 @@ export function EventForm({
 						/>
 					</div>
 
-					<div className="flex gap-2">
-						<Button type="submit" className="flex-1">
-							{submitLabel}
-						</Button>
-						<Button type="button" variant="outline">
-							Cancel
-						</Button>
+					<div className="flex justify-end">
+						<div className="flex w-fit gap-2">
+							<Button className="flex-1">{submitLabel}</Button>
+							{onCancel && (
+								<Button type="button" variant="ghost" onClick={onCancel}>
+									Cancel
+								</Button>
+							)}
+						</div>
 					</div>
 				</form>
 			</CardContent>

@@ -14,25 +14,30 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DateTimePicker } from '@/components/events/date-time-picker'
-import type { EventWithRelations, Sport, Venue } from '@/db/types'
-import { VenueSelector, SportSelector } from '@/components/selectors'
+import type { EventWithRelations, Sport, Venue, State } from '@/db/types'
+import { SportSelector } from '@/components/selectors'
+import { VenueSelectorEnhanced } from '@/components/venue-selector-enhanced'
 
 interface EditEventDialogProps {
 	event: EventWithRelations
 	sports: Sport[]
 	venues: Venue[]
+	states: State[]
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	onSave: (eventId: string, data: Partial<EventWithRelations>) => void
+	onVenueCreated?: (venue: Venue) => void
 }
 
 export function EditEventDialog({
 	event,
 	sports,
 	venues,
+	states,
 	open,
 	onOpenChange,
 	onSave,
+	onVenueCreated,
 }: EditEventDialogProps) {
 	const [name, setName] = useState(event.name)
 	const [sportId, setSportId] = useState(event.sportId)
@@ -88,14 +93,16 @@ export function EditEventDialog({
 						id="edit-starts-at"
 					/>
 
-					<div className="space-y-2">
-						<Label htmlFor="edit-venue">Venue</Label>
-						<VenueSelector
-							venueId={venueId}
-							setVenueId={setVenueId}
-							venues={venues}
-						/>
-					</div>
+				<div className="space-y-2">
+					<Label htmlFor="edit-venue">Venue</Label>
+					<VenueSelectorEnhanced
+						venueId={venueId}
+						setVenueId={setVenueId}
+						venues={venues}
+						states={states}
+						onVenueCreated={onVenueCreated}
+					/>
+				</div>
 
 					<div className="space-y-2">
 						<Label htmlFor="edit-description">Description</Label>
@@ -108,17 +115,19 @@ export function EditEventDialog({
 						/>
 					</div>
 
-					<div className="flex gap-2">
-						<Button type="submit" className="flex-1">
-							Save Changes
-						</Button>
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => onOpenChange(false)}
-						>
-							Cancel
-						</Button>
+					<div className="flex justify-end">
+						<div className="flex w-fit gap-2">
+							<Button type="submit" className="flex-1">
+								Save Changes
+							</Button>
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={() => onOpenChange(false)}
+							>
+								Cancel
+							</Button>
+						</div>
 					</div>
 				</form>
 			</DialogContent>

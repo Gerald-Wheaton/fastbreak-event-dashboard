@@ -51,8 +51,7 @@ export default function SignupPage() {
 					toast.error(result.error || 'Sign up failed')
 				} else if (result.requiresConfirmation) {
 					toast.success(
-						result.message ||
-							'Please check your email to confirm your account'
+						result.message || 'Please check your email to confirm your account'
 					)
 				}
 			}
@@ -63,7 +62,9 @@ export default function SignupPage() {
 		<div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,hsl(var(--muted)/0.3),hsl(var(--background)))] px-4">
 			<Card className="w-full max-w-md">
 				<CardHeader className="space-y-1">
-					<CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+					<CardTitle className="text-2xl font-bold">
+						Create an account
+					</CardTitle>
 					<CardDescription>
 						Enter your information to get started
 					</CardDescription>
@@ -105,7 +106,7 @@ export default function SignupPage() {
 								required
 								disabled={isPending}
 							/>
-							<p className="text-xs text-muted-foreground">
+							<p className="text-muted-foreground text-xs">
 								Must be at least 8 characters with uppercase, lowercase, and
 								number
 							</p>
@@ -135,11 +136,11 @@ export default function SignupPage() {
 					</form>
 				</CardContent>
 				<CardFooter className="flex flex-col space-y-4">
-					<div className="text-sm text-muted-foreground text-center">
+					<div className="text-muted-foreground text-center text-sm">
 						Already have an account?{' '}
 						<Link
 							href="/login"
-							className="text-primary underline-offset-4 hover:underline font-medium"
+							className="text-primary font-medium underline-offset-4 hover:underline"
 						>
 							Sign in
 						</Link>

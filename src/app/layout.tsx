@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-	title: 'SportEvents - Manage Your Sports Events',
+	title: 'Put Me In Coach - Manage Your Sports Events',
 	description: 'Manage and organize your sports events with ease',
 }
 
@@ -25,7 +25,19 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
+			<head>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							(function() {
+								const theme = localStorage.getItem('theme') || 'dark';
+								document.documentElement.classList.toggle('dark', theme === 'dark');
+							})();
+						`,
+					}}
+				/>
+			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>

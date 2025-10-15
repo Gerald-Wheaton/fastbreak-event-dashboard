@@ -33,7 +33,7 @@ export async function createEvent(data: EventInsert) {
 		const [newEvent] = await db.insert(events).values(validatedData).returning()
 
 		revalidatePath('/dashboard')
-		redirect('/dashboard')
+		return { success: true, data: newEvent }
 	} catch (error) {
 		console.error('Error creating event:', error)
 

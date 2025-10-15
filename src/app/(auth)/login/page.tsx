@@ -13,9 +13,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
-import { login, loginWithGoogle } from './actions'
+import { login } from './actions'
 import { toast } from 'sonner'
-import { LogIn, Mail } from 'lucide-react'
+import { LogIn } from 'lucide-react'
 
 export default function LoginPage() {
 	const [email, setEmail] = useState('')
@@ -38,20 +38,12 @@ export default function LoginPage() {
 		})
 	}
 
-	const handleGoogleLogin = async () => {
-		startTransition(async () => {
-			await loginWithGoogle()
-		})
-	}
-
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,hsl(var(--muted)/0.3),hsl(var(--background)))] px-4">
-			<Card className="w-full max-w-md">
+			<Card className="drop-shadow-primary w-full max-w-md drop-shadow-lg">
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-					<CardDescription>
-						Sign in to your account to continue
-					</CardDescription>
+					<CardDescription>Sign in to your account to continue</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<form onSubmit={handleEmailLogin} className="space-y-4">
@@ -79,49 +71,24 @@ export default function LoginPage() {
 								disabled={isPending}
 							/>
 						</div>
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={isPending}
-						>
+						<Button type="submit" className="w-full" disabled={isPending}>
 							{isPending ? (
 								'Signing in...'
 							) : (
 								<>
 									<LogIn className="mr-2 h-4 w-4" />
-									Sign in with Email
+									Sign in
 								</>
 							)}
 						</Button>
 					</form>
-
-					<div className="relative">
-						<div className="absolute inset-0 flex items-center">
-							<span className="w-full border-t" />
-						</div>
-						<div className="relative flex justify-center text-xs uppercase">
-							<span className="bg-background px-2 text-muted-foreground">
-								Or continue with
-							</span>
-						</div>
-					</div>
-
-					<Button
-						variant="outline"
-						className="w-full"
-						onClick={handleGoogleLogin}
-						disabled={isPending}
-					>
-						<Mail className="mr-2 h-4 w-4" />
-						Sign in with Google
-					</Button>
 				</CardContent>
 				<CardFooter className="flex flex-col space-y-4">
-					<div className="text-sm text-muted-foreground text-center">
+					<div className="text-muted-foreground text-center text-sm">
 						Don&apos;t have an account?{' '}
 						<Link
 							href="/signup"
-							className="text-primary underline-offset-4 hover:underline font-medium"
+							className="text-primary font-medium underline-offset-4 hover:underline"
 						>
 							Sign up
 						</Link>

@@ -6,7 +6,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { groupEventsByDate } from '@/lib/date-utils'
 import { useState, useTransition } from 'react'
 import { isToday, isThisMonth } from 'date-fns'
-import type { EventWithRelations, Sport, Venue } from '@/db/types'
+import type { EventWithRelations, Sport, Venue, State } from '@/db/types'
 import {
 	deleteEvent as deleteEventAction,
 	updateEvent as updateEventAction,
@@ -17,14 +17,17 @@ interface EventsDashboardClientProps {
 	initialEvents: EventWithRelations[]
 	sports: Sport[]
 	venues: Venue[]
+	states: State[]
 }
 
 export function EventsDashboardClient({
 	initialEvents,
 	sports,
 	venues,
+	states,
 }: EventsDashboardClientProps) {
 	const [events, setEvents] = useState<EventWithRelations[]>(initialEvents)
+	const [localVenues, setLocalVenues] = useState<Venue[]>(venues)
 	const [searchTerm, setSearchTerm] = useState('')
 	const [sportFilters, setSportFilters] = useState<string[]>([])
 	const [timePeriod, setTimePeriod] = useState<'all' | 'today' | 'month'>('all')
@@ -106,6 +109,10 @@ export function EventsDashboardClient({
 		})
 	}
 
+	const handleVenueCreated = (newVenue: Venue) => {
+		setLocalVenues((prev) => [...prev, newVenue])
+	}
+
 	return (
 		<div className="min-h-screen bg-[radial-gradient(circle_at_top,hsl(var(--muted)/0.3),hsl(var(--background)))]">
 			<main className="container mx-auto px-4 py-8">
@@ -140,9 +147,11 @@ export function EventsDashboardClient({
 												key={event.id}
 												event={event}
 												sports={sports}
-												venues={venues}
+												venues={localVenues}
+												states={states}
 												onDelete={handleDelete}
 												onEdit={handleUpdate}
+												onVenueCreated={handleVenueCreated}
 											/>
 										))}
 									</div>

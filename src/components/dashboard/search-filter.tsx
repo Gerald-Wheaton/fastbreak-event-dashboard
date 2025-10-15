@@ -89,7 +89,7 @@ export function SearchFilter({
 				</Badge>
 			</div>
 
-			<div className="flex max-w-lg flex-wrap items-center gap-2">
+			<div className="flex max-w-lg flex-wrap items-center gap-3">
 				<span className="text-muted-foreground text-sm font-medium">
 					Sport:
 				</span>
