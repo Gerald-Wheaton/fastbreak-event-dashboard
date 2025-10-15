@@ -61,11 +61,11 @@ export function EditEventDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+			<DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>Edit Event</DialogTitle>
 				</DialogHeader>
-				<form onSubmit={handleSubmit} className="space-y-6">
+				<form onSubmit={handleSubmit} className="min-w-0 space-y-6">
 					<div className="space-y-2">
 						<Label htmlFor="edit-name">Event Name</Label>
 						<Input
@@ -93,16 +93,16 @@ export function EditEventDialog({
 						id="edit-starts-at"
 					/>
 
-				<div className="space-y-2">
-					<Label htmlFor="edit-venue">Venue</Label>
-					<VenueSelectorEnhanced
-						venueId={venueId}
-						setVenueId={setVenueId}
-						venues={venues}
-						states={states}
-						onVenueCreated={onVenueCreated}
-					/>
-				</div>
+					<div className="space-y-2">
+						<Label htmlFor="edit-venue">Venue</Label>
+						<VenueSelectorEnhanced
+							venueId={venueId}
+							setVenueId={setVenueId}
+							venues={venues}
+							states={states}
+							onVenueCreated={onVenueCreated}
+						/>
+					</div>
 
 					<div className="space-y-2">
 						<Label htmlFor="edit-description">Description</Label>

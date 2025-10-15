@@ -81,12 +81,12 @@ export function VenueSelectorEnhanced({
 			setVenueId(result.data.id)
 			setCreateDialogOpen(false)
 			setOpen(false)
-			
+
 			// Reset form
 			setNewVenueName('')
 			setNewVenueCity('')
 			setNewVenueState('')
-			
+
 			if (onVenueCreated) {
 				onVenueCreated(result.data)
 			}
@@ -103,17 +103,37 @@ export function VenueSelectorEnhanced({
 						aria-expanded={open}
 						className="w-full justify-between"
 					>
-						{selectedVenue
-							? `${selectedVenue.name} - ${selectedVenue.city}, ${selectedVenue.stateAbbr}`
-							: 'Select a venue'}
+						<span className="truncate">
+							{selectedVenue
+								? `${selectedVenue.name} - ${selectedVenue.city}, ${selectedVenue.stateAbbr}`
+								: 'Select a venue'}
+						</span>
 						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="w-[400px] p-0" align="start">
+				<PopoverContent className="w-[min(400px,90vw)] p-0" align="start">
 					<Command>
 						<CommandInput placeholder="Search venues..." />
 						<CommandList>
-							<CommandEmpty>No venues found</CommandEmpty>
+							<CommandEmpty>
+								<div className="py-6 text-center">
+									<p className="text-muted-foreground mb-3 text-sm">
+										No venues found
+									</p>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => {
+											setCreateDialogOpen(true)
+											setOpen(false)
+										}}
+										className="mx-auto"
+									>
+										<Plus className="mr-2 h-4 w-4" />
+										Create new venue
+									</Button>
+								</div>
+							</CommandEmpty>
 							<CommandGroup>
 								{venues.map((venue) => (
 									<CommandItem
@@ -123,16 +143,19 @@ export function VenueSelectorEnhanced({
 											setVenueId(venue.id)
 											setOpen(false)
 										}}
+										className={cn(
+											venueId === venue.id && 'bg-primary/25 border-primary'
+										)}
 									>
 										<Check
 											className={cn(
-												'mr-2 h-4 w-4',
+												'text-primary mr-2 h-4 w-4',
 												venueId === venue.id ? 'opacity-100' : 'opacity-0'
 											)}
 										/>
 										<div className="flex flex-col">
 											<span className="font-medium">{venue.name}</span>
-											<span className="text-xs text-muted-foreground">
+											<span className="text-muted-foreground text-xs">
 												{venue.city}, {venue.stateAbbr}
 											</span>
 										</div>
@@ -157,14 +180,14 @@ export function VenueSelectorEnhanced({
 			</Popover>
 
 			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-				<DialogContent>
+				<DialogContent className="overflow-x-hidden">
 					<DialogHeader>
 						<DialogTitle>Create New Venue</DialogTitle>
 						<DialogDescription>
 							Add a new venue to your event options
 						</DialogDescription>
 					</DialogHeader>
-					<div className="space-y-4">
+					<div className="min-w-0 space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="new-venue-name">Venue Name</Label>
 							<Input
@@ -199,7 +222,10 @@ export function VenueSelectorEnhanced({
 								</SelectTrigger>
 								<SelectContent className="max-h-[300px]">
 									{states.map((state) => (
-										<SelectItem key={state.abbreviation} value={state.abbreviation}>
+										<SelectItem
+											key={state.abbreviation}
+											value={state.abbreviation}
+										>
 											{state.name} ({state.abbreviation})
 										</SelectItem>
 									))}
@@ -231,4 +257,3 @@ export function VenueSelectorEnhanced({
 		</>
 	)
 }
-
