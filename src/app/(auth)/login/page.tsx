@@ -40,12 +40,10 @@ export default function LoginPage() {
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,hsl(var(--muted)/0.3),hsl(var(--background)))] px-4">
-			<Card className="w-full max-w-md drop-shadow-lg drop-shadow-primary">
+			<Card className="drop-shadow-primary w-full max-w-md drop-shadow-lg">
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-					<CardDescription>
-						Sign in to your account to continue
-					</CardDescription>
+					<CardDescription>Sign in to your account to continue</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<form onSubmit={handleEmailLogin} className="space-y-4">
@@ -73,11 +71,7 @@ export default function LoginPage() {
 								disabled={isPending}
 							/>
 						</div>
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={isPending}
-						>
+						<Button type="submit" className="w-full" disabled={isPending}>
 							{isPending ? (
 								'Signing in...'
 							) : (
@@ -90,11 +84,11 @@ export default function LoginPage() {
 					</form>
 				</CardContent>
 				<CardFooter className="flex flex-col space-y-4">
-					<div className="text-sm text-muted-foreground text-center">
+					<div className="text-muted-foreground text-center text-sm">
 						Don&apos;t have an account?{' '}
 						<Link
 							href="/signup"
-							className="text-primary underline-offset-4 hover:underline font-medium"
+							className="text-primary font-medium underline-offset-4 hover:underline"
 						>
 							Sign up
 						</Link>

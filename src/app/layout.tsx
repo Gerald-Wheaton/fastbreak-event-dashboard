@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-	title: 'SportEvents - Manage Your Sports Events',
+	title: 'Put Me In Coach - Manage Your Sports Events',
 	description: 'Manage and organize your sports events with ease',
 }
 
@@ -31,7 +31,7 @@ export default function RootLayout({
 					dangerouslySetInnerHTML={{
 						__html: `
 							(function() {
-								const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+								const theme = localStorage.getItem('theme') || 'dark';
 								document.documentElement.classList.toggle('dark', theme === 'dark');
 							})();
 						`,

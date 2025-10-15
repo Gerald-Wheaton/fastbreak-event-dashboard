@@ -89,45 +89,45 @@ export function SearchFilter({
 				</Badge>
 			</div>
 
-		<div className="flex max-w-lg flex-wrap items-center gap-3">
-			<span className="text-muted-foreground text-sm font-medium">
-				Sport:
-			</span>
-			<Badge
-				variant={sportFilters.length === 0 ? 'default' : 'outline'}
-				className={cn(
-					'cursor-pointer border-2 transition-all hover:scale-110',
-					sportFilters.length === 0
-						? 'bg-primary text-primary-foreground border-primary scale-110'
-						: 'border-border'
-				)}
-				onClick={() => handleSportFilterChange('all')}
-			>
-				All
-			</Badge>
-			{sports.map((sport: Sport) => {
-				const isSelected = sportFilters.includes(sport.id)
-				return (
-					<Badge
-						key={sport.id}
-						variant="outline"
-						className={cn(
-							'text-foreground cursor-pointer border-2 transition-all hover:scale-110',
-							isSelected && 'scale-110'
-						)}
-						style={{
-							borderColor: sport.color || 'transparent',
-							backgroundColor: isSelected
-								? `${sport.color}40`
-								: 'transparent',
-						}}
-						onClick={() => handleSportFilterChange(sport.id)}
-					>
-						{sport.name}
-					</Badge>
-				)
-			})}
-		</div>
+			<div className="flex max-w-lg flex-wrap items-center gap-3">
+				<span className="text-muted-foreground text-sm font-medium">
+					Sport:
+				</span>
+				<Badge
+					variant={sportFilters.length === 0 ? 'default' : 'outline'}
+					className={cn(
+						'cursor-pointer border-2 transition-all hover:scale-110',
+						sportFilters.length === 0
+							? 'bg-primary text-primary-foreground border-primary scale-110'
+							: 'border-border'
+					)}
+					onClick={() => handleSportFilterChange('all')}
+				>
+					All
+				</Badge>
+				{sports.map((sport: Sport) => {
+					const isSelected = sportFilters.includes(sport.id)
+					return (
+						<Badge
+							key={sport.id}
+							variant="outline"
+							className={cn(
+								'text-foreground cursor-pointer border-2 transition-all hover:scale-110',
+								isSelected && 'scale-110'
+							)}
+							style={{
+								borderColor: sport.color || 'transparent',
+								backgroundColor: isSelected
+									? `${sport.color}40`
+									: 'transparent',
+							}}
+							onClick={() => handleSportFilterChange(sport.id)}
+						>
+							{sport.name}
+						</Badge>
+					)
+				})}
+			</div>
 
 			<div className="relative max-w-sm">
 				<Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />

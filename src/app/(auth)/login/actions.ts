@@ -95,43 +95,43 @@ export async function signup(formData: FormData) {
 
 		const supabase = await createClient()
 
-	const { data, error } = await supabase.auth.signUp({
-		email: validated.email,
-		password: validated.password,
-		options: {
-			data: {
-				display_name: validated.displayName,
+		const { data, error } = await supabase.auth.signUp({
+			email: validated.email,
+			password: validated.password,
+			options: {
+				data: {
+					display_name: validated.displayName,
+				},
 			},
-		},
-	})
-
-	if (error) {
-		return {
-			success: false,
-			error: error.message,
-		}
-	}
-
-	// Create user in database if auth user was created
-	if (data?.user) {
-		await db.insert(users).values({
-			id: data.user.id,
-			displayName: validated.displayName,
-			avatarUrl: data.user.user_metadata.avatar_url || null,
 		})
-	}
 
-	// If email confirmation is required, show message
-	if (data?.user && !data.session) {
-		return {
-			success: true,
-			requiresConfirmation: true,
-			message: 'Please check your email to confirm your account',
+		if (error) {
+			return {
+				success: false,
+				error: error.message,
+			}
 		}
-	}
 
-	revalidatePath('/', 'layout')
-	redirect('/dashboard')
+		// Create user in database if auth user was created
+		if (data?.user) {
+			await db.insert(users).values({
+				id: data.user.id,
+				displayName: validated.displayName,
+				avatarUrl: data.user.user_metadata.avatar_url || null,
+			})
+		}
+
+		// If email confirmation is required, show message
+		if (data?.user && !data.session) {
+			return {
+				success: true,
+				requiresConfirmation: true,
+				message: 'Please check your email to confirm your account',
+			}
+		}
+
+		revalidatePath('/', 'layout')
+		redirect('/dashboard')
 	} catch (error) {
 		if (error instanceof z.ZodError) {
 			return {

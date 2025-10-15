@@ -25,13 +25,22 @@ export function useEventsStore() {
 		if (stored && storedVersion === CURRENT_VERSION) {
 			try {
 				const parsed = JSON.parse(stored)
-				const eventsWithDates = parsed.map((event: Event & { startsAt: string; endsAt: string | null; createdAt: string; updatedAt: string }) => ({
-					...event,
-					startsAt: new Date(event.startsAt),
-					endsAt: event.endsAt ? new Date(event.endsAt) : null,
-					createdAt: new Date(event.createdAt),
-					updatedAt: new Date(event.updatedAt),
-				}))
+				const eventsWithDates = parsed.map(
+					(
+						event: Event & {
+							startsAt: string
+							endsAt: string | null
+							createdAt: string
+							updatedAt: string
+						}
+					) => ({
+						...event,
+						startsAt: new Date(event.startsAt),
+						endsAt: event.endsAt ? new Date(event.endsAt) : null,
+						createdAt: new Date(event.createdAt),
+						updatedAt: new Date(event.updatedAt),
+					})
+				)
 				setEvents(eventsWithDates)
 			} catch (error) {
 				console.error('[v0] Failed to parse stored events:', error)

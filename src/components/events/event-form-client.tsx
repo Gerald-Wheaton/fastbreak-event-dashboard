@@ -2,40 +2,54 @@
 
 import { EventForm } from '@/components/events/event-form'
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
-import { createEvent } from './actions'
+import { useTransition, useState } from 'react'
+import { createEvent } from '../../app/create-event/actions'
 import { toast } from 'sonner'
-import type { Event, Sport, Venue } from '@/db/types'
+import type { Event, Sport, Venue, State } from '@/db/types'
 import type { EventInsert } from '@/db/validations'
 
 interface EventFormClientProps {
 	sports: Sport[]
 	venues: Venue[]
+	states: State[]
 }
 
-export function EventFormClient({ sports, venues }: EventFormClientProps) {
+export function EventFormClient({ sports, venues, states }: EventFormClientProps) {
 	const router = useRouter()
 	const [isPending, startTransition] = useTransition()
+	const [localVenues, setLocalVenues] = useState(venues)
 
 	const handleSubmit = async (data: Partial<Event>) => {
 		startTransition(async () => {
 			const result = await createEvent(data as EventInsert)
 
-			if (result && !result.success) {
+			if (!result.success) {
 				toast.error(result.error || 'Failed to create event')
-			} else {
-				toast.success('Event created successfully!')
-				router.push('/dashboard')
+				return
 			}
+
+			toast.success('Event created successfully!')
+			router.push('/dashboard')
 		})
+	}
+
+	const handleCancel = () => {
+		router.push('/dashboard')
+	}
+
+	const handleVenueCreated = (newVenue: Venue) => {
+		setLocalVenues((prev) => [...prev, newVenue])
 	}
 
 	return (
 		<>
 			<EventForm
 				sports={sports}
-				venues={venues}
+				venues={localVenues}
+				states={states}
 				onSubmit={handleSubmit}
+				onCancel={handleCancel}
+				onVenueCreated={handleVenueCreated}
 				submitLabel="Create Event"
 			/>
 			{isPending && (

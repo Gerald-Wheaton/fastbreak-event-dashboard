@@ -8,13 +8,9 @@ export function ThemeToggle() {
 	const [theme, setTheme] = useState<'light' | 'dark'>('dark')
 
 	useEffect(() => {
-		// Check localStorage and system preference on mount
+		// Default to dark theme (Fastbreak-inspired)
 		const stored = localStorage.getItem('theme') as 'light' | 'dark' | null
-		const systemPrefersDark = window.matchMedia(
-			'(prefers-color-scheme: dark)'
-		).matches
-
-		const initialTheme = stored || (systemPrefersDark ? 'dark' : 'light')
+		const initialTheme = stored || 'dark'
 		setTheme(initialTheme)
 		document.documentElement.classList.toggle('dark', initialTheme === 'dark')
 	}, [])
@@ -42,4 +38,3 @@ export function ThemeToggle() {
 		</Button>
 	)
 }
-

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Calendar, User } from 'lucide-react'
+import { LandPlot, User } from 'lucide-react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -30,8 +30,8 @@ export async function Header() {
 		<header className="border-border bg-card border-b">
 			<div className="container mx-auto flex h-16 items-center justify-between px-4">
 				<Link href="/dashboard" className="flex items-center gap-2">
-					<Calendar className="text-primary h-6 w-6" />
-					<span className="text-foreground text-xl font-bold">SportEvents</span>
+					<LandPlot className="text-primary h-6 w-6" />
+					<span className="text-foreground text-xl font-bold">Put Me In Coach</span>
 				</Link>
 
 				<nav className="flex items-center gap-4">

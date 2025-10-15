@@ -29,21 +29,26 @@ import { isPast } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { EditEventDialog } from '@/components/events/edit-event-dialog'
 import { CountdownTimer } from '@/components/events/count-down-timer'
+import type { State } from '@/db/types'
 
 interface EventCardProps {
 	event: EventWithRelations
 	sports?: Sport[]
 	venues?: Venue[]
+	states?: State[]
 	onDelete?: (id: string) => void
 	onEdit?: (eventId: string, data: Partial<EventWithRelations>) => void
+	onVenueCreated?: (venue: Venue) => void
 }
 
 export function EventCard({
 	event,
 	sports = [],
 	venues = [],
+	states = [],
 	onDelete,
 	onEdit,
+	onVenueCreated,
 }: EventCardProps) {
 	const [editDialogOpen, setEditDialogOpen] = useState(false)
 
@@ -77,13 +82,15 @@ export function EventCard({
 					],
 					hasEnded && 'opacity-60 grayscale'
 				)}
-			style={{
-				borderLeftWidth: '3px',
-				borderLeftColor: event.sport.color || 'transparent',
-				...(!hasEnded && {
-					'--tw-shadow-color': `${event.sport.color}40`,
-				}),
-			} as React.CSSProperties}
+				style={
+					{
+						borderLeftWidth: '3px',
+						borderLeftColor: event.sport.color || 'transparent',
+						...(!hasEnded && {
+							'--tw-shadow-color': `${event.sport.color}40`,
+						}),
+					} as React.CSSProperties
+				}
 			>
 				<CardHeader className="pb-1">
 					<div className="flex items-start justify-between">
@@ -181,16 +188,18 @@ export function EventCard({
 				</CardFooter>
 			</Card>
 
-			{onEdit && (
-				<EditEventDialog
-					event={event}
-					sports={sports}
-					venues={venues}
-					open={editDialogOpen}
-					onOpenChange={setEditDialogOpen}
-					onSave={onEdit}
-				/>
-			)}
+		{onEdit && (
+			<EditEventDialog
+				event={event}
+				sports={sports}
+				venues={venues}
+				states={states}
+				open={editDialogOpen}
+				onOpenChange={setEditDialogOpen}
+				onSave={onEdit}
+				onVenueCreated={onVenueCreated}
+			/>
+		)}
 		</>
 	)
 }
