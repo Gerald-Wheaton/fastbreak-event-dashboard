@@ -87,23 +87,23 @@ bun db:seed:sports       # Seed only sports types
 **Standard Pattern:**
 
 ```typescript
-"use server";
+'use server'
 
 export async function myAction(data: MyType) {
-  try {
-    // 1. Validate with Zod
-    const validated = mySchema.parse(data);
+	try {
+		// 1. Validate with Zod
+		const validated = mySchema.parse(data)
 
-    // 2. Database operation
-    const result = await db.insert(table).values(validated).returning();
+		// 2. Database operation
+		const result = await db.insert(table).values(validated).returning()
 
-    // 3. Revalidate & redirect
-    revalidatePath("/");
-    redirect("/");
-  } catch (error) {
-    // 4. Return error (don't throw to allow client handling)
-    return { success: false, error: error.message };
-  }
+		// 3. Revalidate & redirect
+		revalidatePath('/')
+		redirect('/')
+	} catch (error) {
+		// 4. Return error (don't throw to allow client handling)
+		return { success: false, error: error.message }
+	}
 }
 ```
 
