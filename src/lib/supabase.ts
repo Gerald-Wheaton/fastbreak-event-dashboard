@@ -17,5 +17,5 @@ export const authUsers = pgTable(
 	{
 		id: uuid('id').primaryKey(),
 	},
-	(table) => ({ schema: 'auth' }) as any
+	() => ({ schema: 'auth' }) as { schema: string }
 )

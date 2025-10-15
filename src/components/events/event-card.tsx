@@ -77,13 +77,13 @@ export function EventCard({
 					],
 					hasEnded && 'opacity-60 grayscale'
 				)}
-				style={{
-					borderLeftWidth: '3px',
-					borderLeftColor: event.sport.color || 'transparent',
-					...((!hasEnded && {
-						'--tw-shadow-color': `${event.sport.color}40`,
-					}) as any),
-				}}
+			style={{
+				borderLeftWidth: '3px',
+				borderLeftColor: event.sport.color || 'transparent',
+				...(!hasEnded && {
+					'--tw-shadow-color': `${event.sport.color}40`,
+				}),
+			} as React.CSSProperties}
 			>
 				<CardHeader className="pb-1">
 					<div className="flex items-start justify-between">
