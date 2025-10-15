@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { createEvent } from './actions'
 import { toast } from 'sonner'
-import type { Sport, Venue } from '@/db/types'
+import type { Event, Sport, Venue } from '@/db/types'
+import type { EventInsert } from '@/db/validations'
 
 interface EventFormClientProps {
 	sports: Sport[]
@@ -16,9 +17,9 @@ export function EventFormClient({ sports, venues }: EventFormClientProps) {
 	const router = useRouter()
 	const [isPending, startTransition] = useTransition()
 
-	const handleSubmit = async (data: any) => {
+	const handleSubmit = async (data: Partial<Event>) => {
 		startTransition(async () => {
-			const result = await createEvent(data)
+			const result = await createEvent(data as EventInsert)
 
 			if (result && !result.success) {
 				toast.error(result.error || 'Failed to create event')

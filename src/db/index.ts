@@ -1,12 +1,13 @@
-// Load environment variables if not in Next.js runtime
-if (typeof window === 'undefined' && !process.env.NEXT_RUNTIME) {
-	const { config } = require('dotenv')
-	config({ path: '.env.local' })
-}
-
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from './schema'
+
+// Load environment variables if not in Next.js runtime
+if (typeof window === 'undefined' && !process.env.NEXT_RUNTIME) {
+	await import('dotenv').then((dotenv) => {
+		dotenv.config({ path: '.env.local' })
+	})
+}
 
 const connectionString = process.env.DATABASE_URL!
 

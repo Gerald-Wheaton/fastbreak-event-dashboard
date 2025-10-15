@@ -25,7 +25,7 @@ export function useEventsStore() {
 		if (stored && storedVersion === CURRENT_VERSION) {
 			try {
 				const parsed = JSON.parse(stored)
-				const eventsWithDates = parsed.map((event: any) => ({
+				const eventsWithDates = parsed.map((event: Event & { startsAt: string; endsAt: string | null; createdAt: string; updatedAt: string }) => ({
 					...event,
 					startsAt: new Date(event.startsAt),
 					endsAt: event.endsAt ? new Date(event.endsAt) : null,
