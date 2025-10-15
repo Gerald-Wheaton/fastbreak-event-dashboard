@@ -97,16 +97,16 @@ export function EventForm({
 						id="starts-at"
 					/>
 
-				<div className="space-y-2">
-					<Label htmlFor="venue">Venue</Label>
-					<VenueSelectorEnhanced
-						venueId={venueId}
-						setVenueId={setVenueId}
-						venues={venues}
-						states={states}
-						onVenueCreated={onVenueCreated}
-					/>
-				</div>
+					<div className="space-y-2">
+						<Label htmlFor="venue">Venue</Label>
+						<VenueSelectorEnhanced
+							venueId={venueId}
+							setVenueId={setVenueId}
+							venues={venues}
+							states={states}
+							onVenueCreated={onVenueCreated}
+						/>
+					</div>
 
 					<div className="space-y-2">
 						<Label htmlFor="description">Description</Label>

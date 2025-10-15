@@ -14,7 +14,11 @@ interface EventFormClientProps {
 	states: State[]
 }
 
-export function EventFormClient({ sports, venues, states }: EventFormClientProps) {
+export function EventFormClient({
+	sports,
+	venues,
+	states,
+}: EventFormClientProps) {
 	const router = useRouter()
 	const [isPending, startTransition] = useTransition()
 	const [localVenues, setLocalVenues] = useState(venues)

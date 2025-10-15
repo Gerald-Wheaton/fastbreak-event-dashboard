@@ -155,7 +155,7 @@ export function EventCard({
 						className={cn(
 							'flex justify-center gap-1.5 transition-all duration-300 ease-out',
 							!hasEnded
-								? 'translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'
+								? 'translate-y-0 opacity-100 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100'
 								: 'translate-y-0 opacity-100'
 						)}
 					>
@@ -188,18 +188,18 @@ export function EventCard({
 				</CardFooter>
 			</Card>
 
-		{onEdit && (
-			<EditEventDialog
-				event={event}
-				sports={sports}
-				venues={venues}
-				states={states}
-				open={editDialogOpen}
-				onOpenChange={setEditDialogOpen}
-				onSave={onEdit}
-				onVenueCreated={onVenueCreated}
-			/>
-		)}
+			{onEdit && (
+				<EditEventDialog
+					event={event}
+					sports={sports}
+					venues={venues}
+					states={states}
+					open={editDialogOpen}
+					onOpenChange={setEditDialogOpen}
+					onSave={onEdit}
+					onVenueCreated={onVenueCreated}
+				/>
+			)}
 		</>
 	)
 }
