@@ -5,7 +5,7 @@ import { SearchFilter } from '@/components/dashboard/search-filter'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { groupEventsByDate } from '@/lib/date-utils'
 import { useState, useTransition } from 'react'
-import { isToday, isThisMonth } from 'date-fns'
+import { isToday, isThisWeek, isThisMonth, isPast } from 'date-fns'
 import type { EventWithRelations, Sport, Venue, State } from '@/db/types'
 import {
 	deleteEvent as deleteEventAction,
@@ -30,7 +30,7 @@ export function EventsDashboardClient({
 	const [localVenues, setLocalVenues] = useState<Venue[]>(venues)
 	const [searchTerm, setSearchTerm] = useState('')
 	const [sportFilters, setSportFilters] = useState<string[]>([])
-	const [timePeriod, setTimePeriod] = useState<'all' | 'today' | 'month'>('all')
+	const [timePeriod, setTimePeriod] = useState<'all' | 'today' | 'week' | 'month'>('all')
 	const [isPending, startTransition] = useTransition()
 
 	const filteredEvents = events.filter((event: EventWithRelations) => {
@@ -41,24 +41,38 @@ export function EventsDashboardClient({
 			sportFilters.length === 0 || sportFilters.includes(event.sportId)
 
 		let matchesTimePeriod = true
+		const eventDate = new Date(event.startsAt)
+
 		if (timePeriod === 'today') {
-			matchesTimePeriod = isToday(new Date(event.startsAt))
+			matchesTimePeriod = isToday(eventDate)
+		} else if (timePeriod === 'week') {
+			matchesTimePeriod = isThisWeek(eventDate) && !isPast(eventDate)
 		} else if (timePeriod === 'month') {
-			matchesTimePeriod = isThisMonth(new Date(event.startsAt))
+			matchesTimePeriod = isThisMonth(eventDate)
 		}
 
 		return matchesSearch && matchesSport && matchesTimePeriod
 	})
 
-	const groupedEvents = groupEventsByDate(filteredEvents)
+	// Special handling for "This Week" and "This Month" filters - create single group views
+	const groupedEvents =
+		timePeriod === 'week'
+			? { 'This Week': filteredEvents }
+			: timePeriod === 'month'
+				? { 'This Month': filteredEvents }
+				: groupEventsByDate(filteredEvents)
+
 	const hasEvents = filteredEvents.length > 0
 
 	const getVisibleGroups = (): string[] => {
 		if (timePeriod === 'today') {
 			return ['Today']
 		}
+		if (timePeriod === 'week') {
+			return ['This Week']
+		}
 		if (timePeriod === 'month') {
-			return ['Today', 'This Week', 'Upcoming']
+			return ['This Month']
 		}
 		return ['Today', 'This Week', 'Upcoming', 'Past Events']
 	}
@@ -114,7 +128,7 @@ export function EventsDashboardClient({
 	}
 
 	return (
-		<div className="min-h-screen bg-[radial-gradient(circle_at_top,hsl(var(--muted)/0.3),hsl(var(--background)))]">
+		<div className="min-h-screen">
 			<main className="container mx-auto px-4 py-8">
 				<div className="mb-8 space-y-2">
 					<h1 className="text-3xl font-bold text-balance">Event Dashboard</h1>

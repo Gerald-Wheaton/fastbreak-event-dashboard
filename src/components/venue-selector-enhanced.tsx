@@ -112,7 +112,7 @@ export function VenueSelectorEnhanced({
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-[min(400px,90vw)] p-0" align="start">
-					<Command>
+					<Command className="h-auto">
 						<CommandInput placeholder="Search venues..." />
 						<CommandList>
 							<CommandEmpty>

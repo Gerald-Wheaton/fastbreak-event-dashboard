@@ -11,7 +11,7 @@ interface SearchFilterProps {
 	sports: Sport[]
 	onSearchChange: (search: string) => void
 	onSportFilterChange: (sportIds: string[]) => void
-	onTimePeriodChange: (period: 'all' | 'today' | 'month') => void
+	onTimePeriodChange: (period: 'all' | 'today' | 'week' | 'month') => void
 }
 
 export function SearchFilter({
@@ -22,7 +22,7 @@ export function SearchFilter({
 }: SearchFilterProps) {
 	const [search, setSearch] = useState('')
 	const [sportFilters, setSportFilters] = useState<string[]>([])
-	const [timePeriod, setTimePeriod] = useState<'all' | 'today' | 'month'>('all')
+	const [timePeriod, setTimePeriod] = useState<'all' | 'today' | 'week' | 'month'>('all')
 
 	const handleSearchChange = (value: string) => {
 		setSearch(value)
@@ -48,13 +48,13 @@ export function SearchFilter({
 		onSportFilterChange(newFilters)
 	}
 
-	const handleTimePeriodChange = (value: 'all' | 'today' | 'month') => {
+	const handleTimePeriodChange = (value: 'all' | 'today' | 'week' | 'month') => {
 		setTimePeriod(value)
 		onTimePeriodChange(value)
 	}
 
 	return (
-		<div className="space-y-4 rounded-lg border bg-card p-4 drop-shadow-sm drop-shadow-primary">
+		<div className="space-y-4 rounded-lg border bg-card p-4 dark:drop-shadow-sm dark:drop-shadow-primary">
 			{/* Top Row: Search Bar + View Filters */}
 			<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
 				{/* Search Bar */}
@@ -92,6 +92,16 @@ export function SearchFilter({
 						Today
 					</Badge>
 					<Badge
+						variant={timePeriod === 'week' ? 'default' : 'outline'}
+						className={cn(
+							'cursor-pointer transition-colors',
+							timePeriod === 'week' && 'bg-primary text-primary-foreground'
+						)}
+						onClick={() => handleTimePeriodChange('week')}
+					>
+						This Week
+					</Badge>
+					<Badge
 						variant={timePeriod === 'month' ? 'default' : 'outline'}
 						className={cn(
 							'cursor-pointer transition-colors',
@@ -99,7 +109,7 @@ export function SearchFilter({
 						)}
 						onClick={() => handleTimePeriodChange('month')}
 					>
-						Month
+						This Month
 					</Badge>
 				</div>
 			</div>

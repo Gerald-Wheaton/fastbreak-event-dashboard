@@ -3,16 +3,30 @@
 import { revalidatePath } from 'next/cache'
 import { db } from '@/db'
 import { events, venues, sports, states, users } from '@/db/schema'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, or, isNull } from 'drizzle-orm'
 import { eventUpdateSchema, type EventUpdate } from '@/db/validations'
 import type { EventWithRelations } from '@/db/types'
+import { createClient } from '@/lib/supabase/server'
 
 /**
  * Fetch all events with full relations (sport, venue with state, owner)
+ * Only returns events that are public (owner_id = null) or owned by the current user
  */
 export async function getEvents(): Promise<EventWithRelations[]> {
 	try {
+		// Get authenticated user
+		const supabase = await createClient()
+		const {
+			data: { user },
+		} = await supabase.auth.getUser()
+
+		// Build where condition: show events with null owner_id OR events owned by current user
+		const whereCondition = user
+			? or(isNull(events.ownerId), eq(events.ownerId, user.id))
+			: isNull(events.ownerId)
+
 		const result = await db.query.events.findMany({
+			where: whereCondition,
 			with: {
 				sport: true,
 				venue: {

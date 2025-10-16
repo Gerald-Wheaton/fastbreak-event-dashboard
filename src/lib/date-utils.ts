@@ -4,7 +4,6 @@ import {
 	differenceInMinutes,
 	format,
 	isToday,
-	isTomorrow,
 	isThisWeek,
 	isThisMonth,
 	isPast,
@@ -40,10 +39,6 @@ export function formatDateRange(date: Date): string {
 		return `Today at ${format(date, 'h:mm a')}`
 	}
 
-	if (isTomorrow(date)) {
-		return `Tomorrow at ${format(date, 'h:mm a')}`
-	}
-
 	if (isThisWeek(date)) {
 		return format(date, "EEEE 'at' h:mm a")
 	}
@@ -52,24 +47,16 @@ export function formatDateRange(date: Date): string {
 }
 
 export function getDateGroup(date: Date): string {
+	if (isPast(date)) {
+		return 'Past Events'
+	}
+
 	if (isToday(date)) {
 		return 'Today'
 	}
 
-	if (isTomorrow(date)) {
-		return 'Tomorrow'
-	}
-
 	if (isThisWeek(date)) {
 		return 'This Week'
-	}
-
-	if (isThisMonth(date)) {
-		return 'This Month'
-	}
-
-	if (isPast(date)) {
-		return 'Past Events'
 	}
 
 	return 'Upcoming'
@@ -80,7 +67,6 @@ export function groupEventsByDate<T extends { startsAt: Date }>(
 ): Record<string, T[]> {
 	const groups: Record<string, T[]> = {
 		Today: [],
-		Tomorrow: [],
 		'This Week': [],
 		Upcoming: [],
 		'Past Events': [],

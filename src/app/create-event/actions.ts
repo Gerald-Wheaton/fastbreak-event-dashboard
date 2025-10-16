@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { db } from '@/db'
 import { events, sports, venues } from '@/db/schema'
 import { eventInsertSchema, type EventInsert } from '@/db/validations'
+import { createClient } from '@/lib/supabase/server'
 
 export async function getSports() {
 	try {
@@ -26,8 +27,25 @@ export async function getVenues() {
 
 export async function createEvent(data: EventInsert) {
 	try {
-		// Validate data
-		const validatedData = eventInsertSchema.parse(data)
+		// Get authenticated user
+		const supabase = await createClient()
+		const {
+			data: { user },
+			error: authError,
+		} = await supabase.auth.getUser()
+
+		if (authError || !user) {
+			return {
+				success: false,
+				error: 'You must be logged in to create an event',
+			}
+		}
+
+		// Validate data and attach owner ID
+		const validatedData = eventInsertSchema.parse({
+			...data,
+			ownerId: user.id,
+		})
 
 		// Insert event
 		const [newEvent] = await db.insert(events).values(validatedData).returning()
