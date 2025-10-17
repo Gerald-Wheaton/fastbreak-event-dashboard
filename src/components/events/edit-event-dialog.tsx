@@ -1,8 +1,8 @@
 'use client'
 
-import type React from 'react'
-
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
 	Dialog,
 	DialogContent,
@@ -11,12 +11,29 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form'
 import { DateTimePicker } from '@/components/events/date-time-picker'
 import type { EventWithRelations, Sport, Venue, State } from '@/db/types'
 import { SportSelector } from '@/components/selectors'
 import { VenueSelectorEnhanced } from '@/components/venue-selector-enhanced'
+
+const editEventSchema = z.object({
+	name: z.string().min(1, 'Event name is required').max(200),
+	sportId: z.string().min(1, 'Sport is required'),
+	startsAt: z.date(),
+	venueId: z.string().min(1, 'Venue is required'),
+	description: z.string().max(2000).optional(),
+})
+
+type EditEventFormValues = z.infer<typeof editEventSchema>
 
 interface EditEventDialogProps {
 	event: EventWithRelations
@@ -39,23 +56,19 @@ export function EditEventDialog({
 	onSave,
 	onVenueCreated,
 }: EditEventDialogProps) {
-	const [name, setName] = useState(event.name)
-	const [sportId, setSportId] = useState(event.sportId)
-	const [startsAt, setStartsAt] = useState<Date | undefined>(
-		new Date(event.startsAt)
-	)
-	const [venueId, setVenueId] = useState(event.venueId)
-	const [description, setDescription] = useState(event.description || '')
+	const form = useForm<EditEventFormValues>({
+		resolver: zodResolver(editEventSchema),
+		defaultValues: {
+			name: event.name,
+			sportId: event.sportId,
+			startsAt: new Date(event.startsAt),
+			venueId: event.venueId,
+			description: event.description || '',
+		},
+	})
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		onSave(event.id, {
-			name,
-			sportId,
-			startsAt,
-			venueId,
-			description,
-		})
+	const handleSubmit = (data: EditEventFormValues) => {
+		onSave(event.id, data)
 		onOpenChange(false)
 	}
 
@@ -65,71 +78,118 @@ export function EditEventDialog({
 				<DialogHeader>
 					<DialogTitle>Edit Event</DialogTitle>
 				</DialogHeader>
-				<form onSubmit={handleSubmit} className="min-w-0 space-y-6">
-					<div className="space-y-2">
-						<Label htmlFor="edit-name">Event Name</Label>
-						<Input
-							id="edit-name"
-							placeholder="Summer Basketball Tournament"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							required
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(handleSubmit)}
+						className="min-w-0 space-y-6"
+					>
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Event Name</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Summer Basketball Tournament"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-					</div>
 
-					<div className="space-y-2">
-						<Label htmlFor="edit-sport-type">Sport Type</Label>
-						<SportSelector
-							sportId={sportId}
-							setSportId={setSportId}
-							sports={sports}
+						<FormField
+							control={form.control}
+							name="sportId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Sport Type</FormLabel>
+									<FormControl>
+										<SportSelector
+											sportId={field.value}
+											setSportId={field.onChange}
+											sports={sports}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-					</div>
 
-					<DateTimePicker
-						label="Event Date & Time"
-						value={startsAt}
-						onChange={setStartsAt}
-						id="edit-starts-at"
-					/>
-
-					<div className="space-y-2">
-						<Label htmlFor="edit-venue">Venue</Label>
-						<VenueSelectorEnhanced
-							venueId={venueId}
-							setVenueId={setVenueId}
-							venues={venues}
-							states={states}
-							onVenueCreated={onVenueCreated}
+						<FormField
+							control={form.control}
+							name="startsAt"
+							render={({ field }) => (
+								<FormItem>
+									<FormControl>
+										<DateTimePicker
+											label="Event Date & Time"
+											value={field.value}
+											onChange={field.onChange}
+											id="edit-starts-at"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-					</div>
 
-					<div className="space-y-2">
-						<Label htmlFor="edit-description">Description</Label>
-						<Textarea
-							id="edit-description"
-							placeholder="Provide details about the event..."
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							rows={4}
+						<FormField
+							control={form.control}
+							name="venueId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Venue</FormLabel>
+									<FormControl>
+										<VenueSelectorEnhanced
+											venueId={field.value}
+											setVenueId={field.onChange}
+											venues={venues}
+											states={states}
+											onVenueCreated={onVenueCreated}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
-					</div>
 
-					<div className="flex justify-end">
-						<div className="flex w-fit gap-2">
-							<Button type="submit" className="flex-1">
-								Save Changes
-							</Button>
-							<Button
-								type="button"
-								variant="ghost"
-								onClick={() => onOpenChange(false)}
-							>
-								Cancel
-							</Button>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Description</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder="Provide details about the event..."
+											rows={4}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<div className="flex justify-end">
+							<div className="flex w-fit gap-2">
+								<Button type="submit" className="flex-1">
+									Save Changes
+								</Button>
+								<Button
+									type="button"
+									variant="ghost"
+									onClick={() => onOpenChange(false)}
+								>
+									Cancel
+								</Button>
+							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				</Form>
 			</DialogContent>
 		</Dialog>
 	)

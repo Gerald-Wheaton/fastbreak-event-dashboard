@@ -1,10 +1,10 @@
 'use client'
 
-import type React from 'react'
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
 	Card,
@@ -13,10 +13,28 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form'
 import { DateTimePicker } from '@/components/events/date-time-picker'
 import type { Event, Venue, Sport, State } from '@/db/types'
 import { SportSelector } from '../selectors'
 import { VenueSelectorEnhanced } from '../venue-selector-enhanced'
+
+const eventFormSchema = z.object({
+	name: z.string().min(1, 'Event name is required').max(200),
+	sportId: z.string().min(1, 'Sport is required'),
+	startsAt: z.date(),
+	venueId: z.string().min(1, 'Venue is required'),
+	description: z.string().max(2000).optional(),
+})
+
+type EventFormValues = z.infer<typeof eventFormSchema>
 
 interface EventFormProps {
 	sports: Sport[]
@@ -41,23 +59,19 @@ export function EventForm({
 	submitLabel = 'Create Event',
 	onVenueCreated,
 }: EventFormProps) {
-	const [name, setName] = useState(initialData?.name || '')
-	const [sportId, setSportId] = useState(initialData?.sportId || '')
-	const [startsAt, setStartsAt] = useState<Date | undefined>(
-		initialData?.startsAt ? new Date(initialData.startsAt) : undefined
-	)
-	const [venueId, setVenueId] = useState(initialData?.venueId || '')
-	const [description, setDescription] = useState(initialData?.description || '')
+	const form = useForm<EventFormValues>({
+		resolver: zodResolver(eventFormSchema),
+		defaultValues: {
+			name: initialData?.name || '',
+			sportId: initialData?.sportId || '',
+			startsAt: initialData?.startsAt ? new Date(initialData.startsAt) : undefined,
+			venueId: initialData?.venueId || '',
+			description: initialData?.description || '',
+		},
+	})
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		onSubmit({
-			name,
-			sportId,
-			startsAt,
-			venueId,
-			description,
-		})
+	const handleSubmit = (data: EventFormValues) => {
+		onSubmit(data)
 	}
 
 	return (
@@ -69,67 +83,113 @@ export function EventForm({
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form onSubmit={handleSubmit} className="space-y-6">
-					<div className="space-y-2">
-						<Label htmlFor="name">Event Name</Label>
-						<Input
-							id="name"
-							placeholder="Summer Basketball Tournament"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							required
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="sport-type">Sport Type</Label>
-						<SportSelector
-							sportId={sportId}
-							setSportId={setSportId}
-							sports={sports}
-						/>
-					</div>
-
-					<DateTimePicker
-						label="Event Date & Time"
-						value={startsAt}
-						onChange={setStartsAt}
-						id="starts-at"
-					/>
-
-					<div className="space-y-2">
-						<Label htmlFor="venue">Venue</Label>
-						<VenueSelectorEnhanced
-							venueId={venueId}
-							setVenueId={setVenueId}
-							venues={venues}
-							states={states}
-							onVenueCreated={onVenueCreated}
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="description">Description</Label>
-						<Textarea
-							id="description"
-							placeholder="Provide details about the event..."
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							rows={4}
-						/>
-					</div>
-
-					<div className="flex justify-end">
-						<div className="flex w-fit gap-2">
-							<Button className="flex-1">{submitLabel}</Button>
-							{onCancel && (
-								<Button type="button" variant="ghost" onClick={onCancel}>
-									Cancel
-								</Button>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Event Name</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Summer Basketball Tournament"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
 							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="sportId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Sport Type</FormLabel>
+									<FormControl>
+										<SportSelector
+											sportId={field.value}
+											setSportId={field.onChange}
+											sports={sports}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="startsAt"
+							render={({ field }) => (
+								<FormItem>
+									<FormControl>
+										<DateTimePicker
+											label="Event Date & Time"
+											value={field.value}
+											onChange={field.onChange}
+											id="starts-at"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="venueId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Venue</FormLabel>
+									<FormControl>
+										<VenueSelectorEnhanced
+											venueId={field.value}
+											setVenueId={field.onChange}
+											venues={venues}
+											states={states}
+											onVenueCreated={onVenueCreated}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Description</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder="Provide details about the event..."
+											rows={4}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<div className="flex justify-end">
+							<div className="flex w-fit gap-2">
+								<Button type="submit" className="flex-1">
+									{submitLabel}
+								</Button>
+								{onCancel && (
+									<Button type="button" variant="ghost" onClick={onCancel}>
+										Cancel
+									</Button>
+								)}
+							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				</Form>
 			</CardContent>
 		</Card>
 	)

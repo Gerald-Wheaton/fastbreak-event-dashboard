@@ -47,14 +47,14 @@ export function EmptyState() {
 			</p>
 
 			<Link
-				href="/events/create"
+				href="/create-event"
 				className={`transition-all delay-500 duration-700 ${
 					isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
 				}`}
 			>
 				<Button size="lg" className="gap-2">
 					<Sparkles className="h-4 w-4" />
-					Create your first event!
+					Create an event!
 				</Button>
 			</Link>
 
